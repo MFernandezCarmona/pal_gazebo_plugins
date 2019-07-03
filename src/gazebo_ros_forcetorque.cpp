@@ -169,15 +169,21 @@ void FTPlugin::UpdateChild()
     ros::Time now = ros::Time::now();
     if ( ( now - this->lastUpdateTime) >= update_period)
     {
-
-        double rate = footContactSensor->GetUpdateRate();
+        #if GAZEBO_MAJOR_VERSION < 8
+            double rate = footContactSensor->GetUpdateRate();
+        #else
+            double rate = footContactSensor->UpdateRate();
+        #endif
         //ROS_DEBUG("sensor update rate %f, dT elapsed %f [sec]", rate, ( now - this->lastUpdateTime).toSec() ); // TODO: Remove?
-
         this->lastUpdateTime = now;
 
         // Get all the contacts.
         msgs::Contacts contacts;
-        contacts = this->footContactSensor->GetContacts();
+        #if GAZEBO_MAJOR_VERSION < 8
+            contacts = this->footContactSensor->GetContacts();
+        #else
+            contacts = this->footContactSensor->Contacts();
+        #endif
 
         for (int i = 0; i < contacts.contact_size(); ++i)
         {
@@ -228,4 +234,3 @@ void FTPlugin::RosQueueThread()
   }
 }
 }
-
